@@ -1,5 +1,7 @@
 def projectName = "${PROJECT_NAME}"
-def gitUrl = "${GIT_URL}"
+def gitUrl_sources = "${GIT_URL_SOURCES}"
+def gitUrl_ansible = "${GIT_URL_ANSIBLE}"
+def gitBranch_ansible = "${GIT_BRANCH_ANSIBLE}"
 def leaderEmail = "${LEADER_EMAIL}"
 def stashCredentialId = "${STASH_CREDENTIAL_ID}"
 def stashBaseUrl = 'https://cipcssmc.carrefour.com/stash'
@@ -48,7 +50,7 @@ job("${projectName}/bitbucket_trigger_pr") {
 
 job("${projectName}/bitbucket_trigger_pr_merged") {
     scm {
-        git(gitUrl)
+        git(gitUrl_sources)
     }
     triggers {
         scm('*/15 * * * *')
@@ -58,9 +60,33 @@ job("${projectName}/bitbucket_trigger_pr_merged") {
     }
 }
 
+job("${projectName}/build_env") {
+  parameters {
+      choiceParam('INT_ENV',
+      [
+        'int0/int0',
+        'int1/int1',
+        'int2/int2'
+      ],
+      'Selected the environment to build.'
+      )
+  }
+  logRotator {
+      numToKeep(5)
+      artifactNumToKeep(1)
+  }
+  scm {
+      git(gitUrl_ansible)
+      branch(gitBranch_ansible)
+  }
+  steps {
+      shell('echo build_env')
+  }
+}
+
 job("${projectName}/analyze_sonar") {
     scm {
-        git(gitUrl)
+        git(gitUrl_sources)
     }
     triggers {
         cron('15 13 * * *')
@@ -70,21 +96,9 @@ job("${projectName}/analyze_sonar") {
     }
 }
 
-job("${projectName}/build_env") {
-    scm {
-        git(gitUrl)
-    }
-    triggers {
-        cron('15 13 * * *')
-    }
-    steps {
-        shell('echo build_env')
-    }
-}
-
 job("${projectName}/deploy") {
     scm {
-        git(gitUrl)
+        git(gitUrl_sources)
     }
     triggers {
         cron('15 13 * * *')
@@ -96,7 +110,7 @@ job("${projectName}/deploy") {
 
 job("${projectName}/package_from_branch") {
     scm {
-        git(gitUrl)
+        git(gitUrl_sources)
     }
     triggers {
         cron('15 13 * * *')
@@ -108,7 +122,7 @@ job("${projectName}/package_from_branch") {
 
 job("${projectName}/package_from_commit_hash") {
     scm {
-        git(gitUrl)
+        git(gitUrl_sources)
     }
     triggers {
         cron('15 13 * * *')
