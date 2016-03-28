@@ -238,13 +238,31 @@ echo COMMIT_HASH=`git rev-parse --verify HEAD` > params.txt''')
 }
 
 job("${projectName}/package_from_commit_hash") {
-    scm {
-        git(sources_gitUrl)
-    }
-    triggers {
-        cron('15 13 * * *')
-    }
-    steps {
-        shell('echo package_from_commit_hash')
-    }
+  parameters {
+      stringParam('COMMIT_HASH', '', '')
+      stringParam('AUTHOR_EMAIL', '', '')
+  }
+  logRotator {
+      numToKeep(5)
+      artifactNumToKeep(1)
+  }
+  scm {
+      git {
+          remote {
+              name('origin')
+              url(sources_gitUrl)
+          }
+          branch('${COMMIT_HASH}')
+          extensions {
+            cleanBeforeCheckout()
+            pruneBranches()
+            relativeTargetDirectory('sources')
+          }
+      }
+  }
+  steps {
+      managedScript('Build PHP Archive') {
+        arguments('${COMMIT_HASH}')
+      }
+  }
 }
