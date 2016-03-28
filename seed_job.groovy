@@ -1,5 +1,6 @@
 def projectName = "${PROJECT_NAME}"
 def sources_gitUrl = "${SOURCES_GIT_URL}"
+def archivePackage = "${ARCHIVE_PACKAGE}"
 def ansible_gitUrl = "${ANSIBLE_GIT_URL}"
 def ansible_gitBranch = "${ANSIBLE_GIT_BRANCH}"
 def ansible_buildPlaybook = "${ANSIBLE_BUILD_PLAYBOOK}"
@@ -262,7 +263,7 @@ job("${projectName}/package_from_commit_hash") {
   }
   steps {
       managedScript('Build PHP Archive') {
-        arguments('${COMMIT_HASH}')
+        arguments('snapshots', "${archivePackage}/archive_\$\{COMMIT_HASH\}.tar.bz2")
       }
   }
   publishers {
