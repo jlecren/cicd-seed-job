@@ -263,7 +263,7 @@ job("${projectName}/package_from_commit_hash") {
   }
   steps {
       managedScript('Build PHP Archive') {
-        arguments('snapshots', "${archivePackage}/archive_\$\{COMMIT_HASH\}.tar.bz2")
+        arguments('snapshots', "${archivePackage}/archive_\${COMMIT_HASH}.tar.bz2")
       }
   }
   publishers {
