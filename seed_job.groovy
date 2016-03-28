@@ -1,7 +1,8 @@
 def projectName = "${PROJECT_NAME}"
-def gitUrl_sources = "${GIT_URL_SOURCES}"
-def gitUrl_ansible = "${GIT_URL_ANSIBLE}"
-def gitBranch_ansible = "${GIT_BRANCH_ANSIBLE}"
+def sources_gitUrl = "${SOURCES_GIT_URL}"
+def ansible_gitUrl = "${ANSIBLE_GIT_URL}"
+def ansible_gitBranch = "${ANSIBLE_GIT_BRANCH}"
+def ansible_playbook = "${ANSIBLE_PLAYBOOK}"
 def leaderEmail = "${LEADER_EMAIL}"
 def stashCredentialId = "${STASH_CREDENTIAL_ID}"
 def stashBaseUrl = 'https://cipcssmc.carrefour.com/stash'
@@ -50,7 +51,7 @@ job("${projectName}/bitbucket_trigger_pr") {
 
 job("${projectName}/bitbucket_trigger_pr_merged") {
     scm {
-        git(gitUrl_sources)
+        git(sources_gitUrl)
     }
     triggers {
         scm('*/15 * * * *')
@@ -79,16 +80,16 @@ job("${projectName}/build_env") {
       git {
           remote {
               name('origin')
-              url(gitUrl_ansible)
+              url(ansible_gitUrl)
           }
-          branch(gitBranch_ansible)
+          branch(ansible_gitBranch)
           extensions {
           }
       }
   }
   configure { project ->
       project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
-          playbook 'toto.yml'
+          playbook(ansible_playbook)
           inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
             path '${INT_ENV}'
           }
@@ -100,7 +101,7 @@ job("${projectName}/build_env") {
 
 job("${projectName}/analyze_sonar") {
     scm {
-        git(gitUrl_sources)
+        git(sources_gitUrl)
     }
     triggers {
         cron('15 13 * * *')
@@ -112,7 +113,7 @@ job("${projectName}/analyze_sonar") {
 
 job("${projectName}/deploy") {
     scm {
-        git(gitUrl_sources)
+        git(sources_gitUrl)
     }
     triggers {
         cron('15 13 * * *')
@@ -124,7 +125,7 @@ job("${projectName}/deploy") {
 
 job("${projectName}/package_from_branch") {
     scm {
-        git(gitUrl_sources)
+        git(sources_gitUrl)
     }
     triggers {
         cron('15 13 * * *')
@@ -136,7 +137,7 @@ job("${projectName}/package_from_branch") {
 
 job("${projectName}/package_from_commit_hash") {
     scm {
-        git(gitUrl_sources)
+        git(sources_gitUrl)
     }
     triggers {
         cron('15 13 * * *')
