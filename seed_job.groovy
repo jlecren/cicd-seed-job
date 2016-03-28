@@ -265,4 +265,7 @@ job("${projectName}/package_from_commit_hash") {
         arguments('${COMMIT_HASH}')
       }
   }
+  publishers {
+      archiveArtifacts('archive.tar.bz2')
+  }
 }
