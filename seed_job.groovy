@@ -83,7 +83,6 @@ job("${projectName}/build_env") {
           }
           branch(gitBranch_ansible)
           extensions {
-              perBuildTag(false)
           }
       }
   }
