@@ -1,18 +1,41 @@
 def projectName = "${PROJECT_NAME}"
 def gitUrl = "${GIT_URL}"
+def leaderEmail = "${LEADER_EMAIL}"
 
 folder("${projectName}")
 
 job("${projectName}/bitbucket_trigger_pr") {
-    scm {
-        git(gitUrl)
+  parameters {
+      stringParam('PULL_REQUEST_FROM_HASH', '', '')
+      stringParam('PULL_REQUEST_AUTHOR_EMAIL', '', '')
+  }
+  logRotator {
+      numToKeep(5)
+      artifactNumToKeep(1)
+  }
+  steps {
+    downstreamParameterized {
+        trigger("${projectName}/deploy_int0") {
+            block {
+                buildStepFailure('FAILURE')
+                failure('FAILURE')
+                unstable('UNSTABLE')
+            }
+            parameters {
+                predefinedProps(
+                  [
+                    COMMIT_HASH: '${PULL_REQUEST_FROM_HASH}',
+                    AUTHOR_EMAIL: '${PULL_REQUEST_AUTHOR_EMAIL}'
+                  ]
+                )
+            }
+        }
     }
-    triggers {
-        scm('*/15 * * * *')
+    publishers {
+        mailer("${leaderEmail}", true, true)
+        stashNotifier()
     }
-    steps {
-        shell('echo bitbucket_trigger_pr')
-    }
+  }
 }
 
 job("${projectName}/bitbucket_trigger_pr_merged") {
