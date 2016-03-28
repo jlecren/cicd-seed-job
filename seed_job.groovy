@@ -111,16 +111,42 @@ job("${projectName}/analyze_sonar") {
     }
 }
 
-job("${projectName}/deploy") {
-    scm {
-        git(sources_gitUrl)
+for(i in 0..2) {
+  job("${projectName}/deploy_int${i}") {
+    parameters {
+        stringParam('COMMIT_HASH', '', '')
+        stringParam('AUTHOR_EMAIL', '', '')
     }
-    triggers {
-        cron('15 13 * * *')
+    logRotator {
+        numToKeep(5)
+        artifactNumToKeep(1)
+    }
+    scm {
+        git {
+            remote {
+                name('origin')
+                url(ansible_gitUrl)
+            }
+            branch(ansible_gitBranch)
+            extensions {
+            }
+        }
     }
     steps {
-        shell('echo deploy')
+      downstreamParameterized {
+          trigger("${projectName}/package_from_commit_hash") {
+              block {
+                  buildStepFailure('FAILURE')
+                  failure('FAILURE')
+                  unstable('UNSTABLE')
+              }
+              parameters {
+                currentBuild()
+              }
+          }
+      }
     }
+  }
 }
 
 job("${projectName}/package_from_branch") {
