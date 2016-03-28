@@ -115,6 +115,7 @@ job("${projectName}/analyze_sonar") {
 }
 
 for(i in 0..2) {
+  def inventoryPath = "environment/int${i}/int${i}"
   job("${projectName}/deploy_int${i}") {
     parameters {
         stringParam('COMMIT_HASH', '', '')
@@ -150,20 +151,20 @@ for(i in 0..2) {
       }
     }
     configure { project ->
-        project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
+        project / builders << 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
             playbook(ansible_deployPlaybook)
             inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
-              path "environment/int${i}/int${i}"
+              path(inventoryPath))
             }
             ansibleName 'Ansible'
             forks '5'
         }
     }
     configure { project ->
-        project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
+        project / builders << 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
             playbook(ansible_testPlaybook)
             inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
-              path "environment/int${i}/int${i}"
+              path(inventoryPath)
             }
             ansibleName 'Ansible'
             forks '5'
