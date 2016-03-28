@@ -37,7 +37,7 @@ job("${projectName}/bitbucket_trigger_pr") {
     publishers {
         mailer("${leaderEmail}", false, true)
         stashNotifier {
-          stashServerBaseUrl("${stashBaseUrl}")
+          stashServerBaseUrl(stashBaseUrl)
           credentialsId("${stashCredentialId}")
           commitSha1('${PULL_REQUEST_FROM_HASH}')
           ignoreUnverifiedSSLPeer()
