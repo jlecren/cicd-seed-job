@@ -153,15 +153,17 @@ for(i in 0..2) {
         project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
             playbook(ansible_deployPlaybook)
             inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
-              path 'environment/int${i}/int${i}'
+              path "environment/int${i}/int${i}"
             }
             ansibleName 'Ansible'
             forks '5'
         }
+    }
+    configure { project ->
         project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
             playbook(ansible_testPlaybook)
             inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
-              path 'environment/int${i}/int${i}'
+              path "environment/int${i}/int${i}"
             }
             ansibleName 'Ansible'
             forks '5'
