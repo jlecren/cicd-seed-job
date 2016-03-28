@@ -178,15 +178,65 @@ for(i in 0..2) {
 }
 
 job("${projectName}/package_from_branch") {
-    scm {
-        git(sources_gitUrl)
-    }
-    triggers {
-        cron('15 13 * * *')
-    }
-    steps {
-        shell('echo package_from_branch')
-    }
+  parameters {
+      stringParam('BRANCH', 'develop', '')
+      stringParam('AUTHOR_EMAIL', '', '')
+      choiceParam('DEPLOY_INT',
+      [
+        "${projectName}/deploy_int1",
+        "${projectName}/deploy_int2"
+      ],
+      'Select the environment to deploy to.'
+      )
+  }
+  logRotator {
+      numToKeep(5)
+      artifactNumToKeep(1)
+  }
+  scm {
+      git {
+          remote {
+              name('origin')
+              url(sources_gitUrl)
+          }
+          branch('*/${BRANCH}')
+          extensions {
+            cleanBeforeCheckout()
+            pruneBranches()
+            relativeTargetDirectory('sources')
+          }
+      }
+  }
+  steps {
+      shell('''
+      cd sources
+      echo COMMIT_HASH=`git rev-parse --verify HEAD` > params.txt
+      ''')
+      downstreamParameterized {
+          trigger("${projectName}/package_from_commit_hash") {
+              block {
+                  buildStepFailure('FAILURE')
+                  failure('FAILURE')
+                  unstable('UNSTABLE')
+              }
+              parameters {
+                propertiesFile('sources/params.txt', true)
+              }
+          }
+      }
+      downstreamParameterized {
+          trigger('${DEPLOY_INT}') {
+              block {
+                  buildStepFailure('FAILURE')
+                  failure('FAILURE')
+                  unstable('UNSTABLE')
+              }
+              parameters {
+                propertiesFile('sources/params.txt', true)
+              }
+          }
+      }
+  }
 }
 
 job("${projectName}/package_from_commit_hash") {
