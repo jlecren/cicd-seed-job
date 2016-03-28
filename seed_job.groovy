@@ -1,6 +1,9 @@
 def projectName = "${PROJECT_NAME}"
 def gitUrl = "${GIT_URL}"
 def leaderEmail = "${LEADER_EMAIL}"
+def stashCredentialId = "${STASH_CREDENTIAL_ID}"
+def stashBaseUrl = 'https://cipcssmc.carrefour.com/stash'
+
 
 folder("${projectName}")
 
@@ -32,8 +35,13 @@ job("${projectName}/bitbucket_trigger_pr") {
         }
     }
     publishers {
-        mailer("${leaderEmail}", true, true)
-        stashNotifier()
+        mailer("${leaderEmail}", false, true)
+        stashNotifier {
+          stashServerBaseUrl("${stashBaseUrl}")
+          credentialsId("${stashCredentialId}")
+          commitSha1('${PULL_REQUEST_FROM_HASH}')
+          ignoreUnverifiedSSLPeer()
+        }
     }
   }
 }
