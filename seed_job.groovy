@@ -208,10 +208,8 @@ job("${projectName}/package_from_branch") {
       }
   }
   steps {
-      shell('''
-      cd sources
-      echo COMMIT_HASH=`git rev-parse --verify HEAD` > params.txt
-      ''')
+      shell('''cd sources
+echo COMMIT_HASH=`git rev-parse --verify HEAD` > params.txt''')
       downstreamParameterized {
           trigger("${projectName}/package_from_commit_hash") {
               block {
