@@ -87,7 +87,7 @@ job("${projectName}/build_env") {
       }
   }
   configure { project ->
-      project / builders / org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder(plugin: "ansible@0.4") {
+      project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
           playbook 'toto.yml'
           inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
             path '${INT_ENV}'
