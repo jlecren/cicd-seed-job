@@ -158,6 +158,7 @@ for(i in 0..2) {
             }
             ansibleName 'Ansible'
             forks '5'
+            additionalParameters '-e "archive_name=archive_${COMMIT_HASH}.tar.bz2"'
         }
     }
     configure { project ->
