@@ -2,8 +2,11 @@ def projectName = "${PROJECT_NAME}"
 def sources_gitUrl = "${SOURCES_GIT_URL}"
 def ansible_gitUrl = "${ANSIBLE_GIT_URL}"
 def ansible_gitBranch = "${ANSIBLE_GIT_BRANCH}"
-def ansible_playbook = "${ANSIBLE_PLAYBOOK}"
+def ansible_buildPlaybook = "${ANSIBLE_BUILD_PLAYBOOK}"
+def ansible_deployPlaybook = "${ANSIBLE_DEPLOY_PLAYBOOK}"
+def ansible_testPlaybook = "${ANSIBLE_TEST_PLAYBOOK}"
 def leaderEmail = "${LEADER_EMAIL}"
+def releaseMgrEmail = "${RELEASE_MGR_EMAIL}"
 def stashCredentialId = "${STASH_CREDENTIAL_ID}"
 def stashBaseUrl = 'https://cipcssmc.carrefour.com/stash'
 
@@ -89,7 +92,7 @@ job("${projectName}/build_env") {
   }
   configure { project ->
       project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
-          playbook(ansible_playbook)
+          playbook(ansible_buildPlaybook)
           inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
             path 'environment/${INT_ENV}'
           }
@@ -145,6 +148,27 @@ for(i in 0..2) {
               }
           }
       }
+    }
+    configure { project ->
+        project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
+            playbook(ansible_deployPlaybook)
+            inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
+              path 'environment/int${i}/int${i}'
+            }
+            ansibleName 'Ansible'
+            forks '5'
+        }
+        project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
+            playbook(ansible_testPlaybook)
+            inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
+              path 'environment/int${i}/int${i}'
+            }
+            ansibleName 'Ansible'
+            forks '5'
+        }
+    }
+    publishers {
+        mailer(releaseMgrEmail, false, false)
     }
   }
 }
