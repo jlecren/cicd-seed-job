@@ -154,7 +154,7 @@ for(i in 0..2) {
         project / builders << 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
             playbook(ansible_deployPlaybook)
             inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
-              path(inventoryPath))
+              path(inventoryPath)
             }
             ansibleName 'Ansible'
             forks '5'
