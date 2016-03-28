@@ -76,8 +76,7 @@ job("${projectName}/build_env") {
       artifactNumToKeep(1)
   }
   scm {
-      git(gitUrl_ansible)
-      branch(gitBranch_ansible)
+      git(gitUrl_ansible, gitBranch_ansible)
   }
   steps {
       shell('echo build_env')
