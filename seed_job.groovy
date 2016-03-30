@@ -92,7 +92,7 @@ job("${projectName}/build_env") {
       }
   }
   configure { project ->
-      project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
+      project / builders / 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.3.1") {
           playbook(ansible_buildPlaybook)
           inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
             path 'environment/${INT_ENV}'
@@ -152,7 +152,7 @@ for(i in 0..2) {
       }
     }
     configure { project ->
-        project / builders << 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
+        project / builders << 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.3.1") {
             playbook(ansible_deployPlaybook)
             inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
               path(inventoryPath)
@@ -163,7 +163,7 @@ for(i in 0..2) {
         }
     }
     configure { project ->
-        project / builders << 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.4") {
+        project / builders << 'org.jenkinsci.plugins.ansible.AnsiblePlaybookBuilder'(plugin: "ansible@0.3.1") {
             playbook(ansible_testPlaybook)
             inventory(class: "org.jenkinsci.plugins.ansible.InventoryPath") {
               path(inventoryPath)
